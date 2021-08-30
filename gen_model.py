@@ -85,7 +85,7 @@ class CaffeNetGenerator:
 
 
         layer.data_param.source = self.lmdb
-        layer.data_param.batch_size = 64
+        layer.data_param.batch_size = 32
         layer.data_param.backend = caffe_pb2.DataParameter.LMDB
 
         sampler = layer.annotated_data_param.batch_sampler.add()
@@ -120,7 +120,7 @@ class CaffeNetGenerator:
         layer.transform_param.resize_param.width = self.input_size
         layer.transform_param.resize_param.interp_mode.append(caffe_pb2.ResizeParameter.LINEAR)
 
-        layer.data_param.source = ""
+        layer.data_param.source = self.lmdb
         layer.data_param.batch_size = 8
         layer.data_param.backend = caffe_pb2.DataParameter.LMDB
         layer.annotated_data_param.label_map_file = self.label_map
@@ -372,7 +372,10 @@ class CaffeNetGenerator:
         layer = self.net.layer.add()
         layer.name = "%s_perm" % name
         layer.type = "Permute"
-        layer.bottom.append(name)
+        if name.count("conf") == 1:
+            layer.bottom.append(name+"_new")
+        else:
+            layer.bottom.append(name)
         layer.top.append("%s_perm" % name)
         for i in [0, 2, 3, 1]:
             layer.permute_param.order.append(i)
@@ -502,7 +505,7 @@ class CaffeNetGenerator:
     def mbox_conf_ssdlite(self, bottom, inp, num):
        name = bottom + "_mbox_conf"
        self.conv_depthwise(name + '/depthwise', inp, 1, bottom=bottom)
-       self.conv(name, num, 1, bias=True)
+       self.conv(name+"_new", num, 1, bias=True)
        self.permute(name)
        self.flatten(name)
 
@@ -561,7 +564,7 @@ class CaffeNetGenerator:
         if FLAGS.lmdb == "":
             if self.stage == "train":
                 self.lmdb = "trainval_lmdb"
-            elif self.stage == "test":
+            if self.stage == "test":
                 self.lmdb = "test_lmdb"
         self.label_map = FLAGS.label_map
         self.eps = FLAGS.eps
