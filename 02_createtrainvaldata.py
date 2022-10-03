@@ -11,9 +11,9 @@ def createTrainvalTxt(baseDirDataSet):
     buffer = ''
     baseDir = baseDirDataSet+'/images'
     for filename in os.listdir(baseDir):
-        filenameOnly, file_extension = os.path.splitext(filename)
+        filenameOnly, file_extension = filename, os.path.splitext(filename)
         # print (file_extension)
-        s = 'images/'+filenameOnly+'.jpg'+' '+'labels/'+filenameOnly+'.xml\n'
+        s = 'images/'+filenameOnly+' '+'labels/'+filenameOnly+'.xml\n'
         print (repr(s))
         img_file, anno = s.strip("\n").split(" ")
         #print(repr(img_file), repr(anno))
