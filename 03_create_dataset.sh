@@ -33,7 +33,7 @@ max_dim=0
 width=0
 height=0
 
-extra_cmd="--encode-type=jpg --encoded"
+extra_cmd="--encode-type=png --encoded"
 if [ $redo ]
 then
   extra_cmd="$extra_cmd --redo"
